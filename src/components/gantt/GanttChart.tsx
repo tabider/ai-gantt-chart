@@ -178,11 +178,15 @@ export function GanttChart({ tasks }: GanttChartProps) {
                                             style={{ left: left + 2, width: Math.max(width - 4, 10) }}
                                             title={`${task.title} (${task.start_date} ~ ${task.end_date})`}
                                         >
+                                            <div
+                                                className="absolute inset-0 bg-black/10 dark:bg-black/30 rounded-lg pointer-events-none"
+                                                style={{ width: `${task.progress || 0}%` }}
+                                            />
                                             <span className={cn(
-                                                "text-[11px] font-medium text-white truncate drop-shadow-sm pointer-events-none sticky left-2",
+                                                "text-[11px] font-medium text-white truncate drop-shadow-sm pointer-events-none sticky left-2 z-10",
                                                 width < 60 && "sr-only"
                                             )}>
-                                                {task.title}
+                                                {task.title} {task.progress ? `(${task.progress}%)` : ''}
                                             </span>
                                         </div>
                                     )}

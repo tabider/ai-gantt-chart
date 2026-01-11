@@ -20,5 +20,14 @@ export type Task = {
   priority: number;   // 1, 2, 3
   color?: TaskColor;
   parent_id?: string | null;
+  progress?: number; // 0-100
+  created_at: string;
+};
+
+export type Comment = {
+  id: string;
+  task_id: string;
+  user_id: string;
+  content: string;
   created_at: string;
 };

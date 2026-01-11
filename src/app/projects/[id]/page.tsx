@@ -97,7 +97,8 @@ export default function ProjectDetailPage({
                         status: taskData.status,
                         priority: taskData.priority,
                         color: taskData.color,
-                        parent_id: taskData.parent_id
+                        parent_id: taskData.parent_id,
+                        progress: taskData.progress
                     })
                     .eq('id', taskData.id);
 
@@ -114,7 +115,8 @@ export default function ProjectDetailPage({
                         status: taskData.status || 'todo',
                         priority: taskData.priority || 2,
                         color: taskData.color || 'blue',
-                        parent_id: taskData.parent_id
+                        parent_id: taskData.parent_id,
+                        progress: taskData.progress || 0
                     }]);
 
                 if (error) throw error;

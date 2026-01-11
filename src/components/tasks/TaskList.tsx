@@ -106,6 +106,11 @@ export function TaskList({ tasks, onEdit }: TaskListProps) {
                                                     <span className="text-[10px] text-gray-400 dark:text-gray-500">
                                                         {format(new Date(task.start_date), 'M/d')} - {format(new Date(task.end_date), 'M/d')}
                                                     </span>
+                                                    {task.progress !== undefined && task.progress > 0 && (
+                                                        <span className="text-[10px] text-gray-400 dark:text-gray-500 border-l border-gray-300 dark:border-gray-700 pl-2 ml-1">
+                                                            {task.progress}%
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
