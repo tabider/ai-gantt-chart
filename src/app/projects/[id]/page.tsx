@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { Project, Task } from '@/types';
@@ -25,12 +25,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
 
     const router = useRouter();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        fetchData();
-    }, [params.id]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             setCurrentUser(user);
@@ -74,7 +69,11 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
         } finally {
             setLoading(false);
         }
-    };
+    }, [params.id, router]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const isOwner = currentUser && project && currentUser.id === project.user_id;
 

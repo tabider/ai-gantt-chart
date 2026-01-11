@@ -40,10 +40,9 @@ export function TaskList({ tasks, onEdit }: TaskListProps) {
             const myChildren = children.filter(c => c.parent_id === p.id);
             myChildren.sort((a, b) => a.start_date.localeCompare(b.start_date));
 
-            myChildren.forEach((child, index) => {
+            myChildren.forEach((child) => {
                 result.push({
-                    task: child,
-                    isLastChild: index === myChildren.length - 1
+                    task: child
                 });
             });
         });
