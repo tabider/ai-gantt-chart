@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Project } from '@/types';
 import Link from 'next/link';
@@ -13,31 +13,31 @@ export default function ProjectsPage() {
     const [isCreating, setIsCreating] = useState(false);
     const router = useRouter();
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
-                    router.push('/login');
-                    return;
-                }
-
-                const { data, error } = await supabase
-                    .from('projects')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-                setProjects(data || []);
-            } catch (error) {
-                console.error('Error fetching projects:', error);
-            } finally {
-                setLoading(false);
+    const fetchProjects = useCallback(async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                router.push('/login');
+                return;
             }
-        };
 
-        fetchProjects();
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setProjects(data || []);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        } finally {
+            setLoading(false);
+        }
     }, [router]);
+
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
 
     const createProject = async (e: React.FormEvent) => {
         e.preventDefault();

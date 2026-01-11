@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState, use, useCallback } from 'react';
+export const runtime = 'edge';
+
+import { useEffect, useState, useCallback, use } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { Project, Task } from '@/types';
@@ -15,8 +17,9 @@ import { Lock, Share2 } from 'lucide-react';
 export default function ProjectDetailPage({
     params,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }) {
+    const projectId = use(params).id;
     const [project, setProject] = useState<Project | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +40,7 @@ export default function ProjectDetailPage({
             const { data: projData, error: projError } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', projectId)
                 .single();
 
             if (projError) {
@@ -60,7 +63,7 @@ export default function ProjectDetailPage({
             const { data: taskData, error: taskError } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('project_id', params.id)
+                .eq('project_id', projectId)
                 .order('start_date', { ascending: true });
 
             if (taskError) throw taskError;
@@ -72,7 +75,7 @@ export default function ProjectDetailPage({
         } finally {
             setLoading(false);
         }
-    }, [params.id, router]);
+    }, [projectId, router]);
 
     useEffect(() => {
         fetchData();
@@ -110,7 +113,7 @@ export default function ProjectDetailPage({
                 const { error } = await supabase
                     .from('tasks')
                     .insert([{
-                        project_id: params.id,
+                        project_id: projectId,
                         title: taskData.title,
                         start_date: taskData.start_date,
                         end_date: taskData.end_date,
