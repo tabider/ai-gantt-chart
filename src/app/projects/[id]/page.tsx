@@ -1,7 +1,5 @@
 'use client';
 
-export const runtime = 'edge';
-
 import { useEffect, useState, use, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
@@ -14,8 +12,11 @@ import { useRouter } from 'next/navigation';
 import { ShareModal } from '@/components/ui/ShareModal';
 import { Lock, Share2 } from 'lucide-react';
 
-export default function ProjectDetailPage(props: { params: Promise<{ id: string }> }) {
-    const params = use(props.params); // Unwrap params
+export default function ProjectDetailPage({
+    params,
+}: {
+    params: { id: string };
+}) {
     const [project, setProject] = useState<Project | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
