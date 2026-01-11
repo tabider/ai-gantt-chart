@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 import { ShareModal } from '@/components/ui/ShareModal';
 import { Lock, Share2 } from 'lucide-react';
 
+import { ModeToggle } from '@/components/theme-toggle';
+
 export default function ProjectDetailPage({
     params,
 }: {
@@ -44,18 +46,13 @@ export default function ProjectDetailPage({
                 .single();
 
             if (projError) {
-                // If error, likely RLS blocked it (private & not owner) or doesn't exist
                 console.error('Project fetch error', projError);
                 if (!user) {
-                    // Not logged in & Error -> Redirect Login
                     router.push('/login');
                     return;
                 }
                 throw projError;
             }
-
-            // Access check: If private & not owner -> This logic is handled by RLS naturally.
-            // If the query returned data, it means we have access (either Owner OR Public).
 
             setProject(projData);
 
@@ -71,7 +68,6 @@ export default function ProjectDetailPage({
 
         } catch (error) {
             console.error('Error:', error);
-            // alert('アクセス権限がないか、プロジェクトが存在しません');
         } finally {
             setLoading(false);
         }
@@ -83,10 +79,8 @@ export default function ProjectDetailPage({
 
     const isOwner = currentUser && project && currentUser.id === project.user_id;
 
-    // ... (Handlers)
-
     const handleCreateOrUpdateTask = async (taskData: Partial<Task>) => {
-        if (!isOwner) return; // Guard
+        if (!isOwner) return;
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
@@ -136,32 +130,34 @@ export default function ProjectDetailPage({
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center p-8 h-screen bg-gray-50 text-gray-500 font-medium">読み込み中...</div>;
-    if (!project) return <div className="flex items-center justify-center p-8 h-screen bg-gray-50 text-gray-500">プロジェクトが見つかりません。</div>;
+    if (loading) return <div className="flex items-center justify-center p-8 h-screen bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 font-medium">読み込み中...</div>;
+    if (!project) return <div className="flex items-center justify-center p-8 h-screen bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400">プロジェクトが見つかりません。</div>;
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+        <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden text-gray-900 dark:text-gray-100 transition-colors">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shrink-0 h-16 z-30 relative">
+            <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-between items-center shrink-0 h-16 z-30 relative transition-colors">
                 <div className="flex items-center gap-4">
-                    <Link href="/projects" className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1 transition-colors">
+                    <Link href="/projects" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm flex items-center gap-1 transition-colors">
                         ← <span className="hidden sm:inline">一覧へ</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <h1 className="text-xl font-bold text-gray-900 tracking-tight">{project.name}</h1>
+                        <h1 className="text-xl font-bold tracking-tight">{project.name}</h1>
                         {!isOwner && (
-                            <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full border border-gray-200 flex items-center gap-1">
+                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 flex items-center gap-1">
                                 <Lock size={10} /> 閲覧のみ
                             </span>
                         )}
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    <ModeToggle />
+
                     {/* Share Button (Owner Only) */}
                     {isOwner && (
                         <button
                             onClick={() => setShareModalOpen(true)}
-                            className="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                            className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
                             title="共有設定"
                         >
                             <Share2 size={20} />
@@ -175,7 +171,7 @@ export default function ProjectDetailPage({
                                 setEditingTask(null);
                                 setModalOpen(true);
                             }}
-                            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm font-medium shadow-md shadow-gray-200 transition-all active:scale-95"
+                            className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 text-sm font-medium shadow-md shadow-gray-200 dark:shadow-none transition-all active:scale-95"
                         >
                             + タスク追加
                         </button>
@@ -204,7 +200,7 @@ export default function ProjectDetailPage({
                 </div>
             </div>
 
-            {/* Modals (Only rendered/active often logic wise, but safe to keep mounted) */}
+            {/* Modals */}
             <TaskFormModal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}

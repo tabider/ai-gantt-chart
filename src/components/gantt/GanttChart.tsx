@@ -81,19 +81,19 @@ export function GanttChart({ tasks }: GanttChartProps) {
     const TOTAL_HEADER_HEIGHT = DAY_HEADER_HEIGHT + MONTH_HEADER_HEIGHT;
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden h-full flex flex-col">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-gray-800 overflow-hidden h-full flex flex-col transition-colors">
             <div className="overflow-x-auto overflow-y-hidden flex-1 relative scrollbar-hide">
                 <div style={{ width: dates.length * CELL_WIDTH, minWidth: '100%' }}>
 
                     {/* Header Wrapper */}
-                    <div className="sticky top-0 z-20 bg-gray-50/90 backdrop-blur-sm border-b border-gray-100 shadow-sm" style={{ height: TOTAL_HEADER_HEIGHT }}>
+                    <div className="sticky top-0 z-20 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 shadow-sm" style={{ height: TOTAL_HEADER_HEIGHT }}>
 
                         {/* Month Header */}
-                        <div className="flex border-b border-gray-100" style={{ height: MONTH_HEADER_HEIGHT }}>
+                        <div className="flex border-b border-gray-100 dark:border-gray-800" style={{ height: MONTH_HEADER_HEIGHT }}>
                             {months.map((month) => (
                                 <div
                                     key={month.key}
-                                    className="flex-shrink-0 px-3 flex items-center text-xs font-bold text-gray-500 border-r border-gray-100"
+                                    className="flex-shrink-0 px-3 flex items-center text-xs font-bold text-gray-500 dark:text-gray-400 border-r border-gray-100 dark:border-gray-800"
                                     style={{ width: month.count * CELL_WIDTH }}
                                 >
                                     {format(month.date, 'yyyy年 M月', { locale: ja })}
@@ -110,13 +110,12 @@ export function GanttChart({ tasks }: GanttChartProps) {
                                     <div
                                         key={i}
                                         className={cn(
-                                            "flex-shrink-0 flex flex-col items-center justify-center border-r border-gray-50 text-[10px]",
-                                            isWeekend ? "bg-gray-50/50 text-gray-400" : "text-gray-600",
-                                            isToday && "bg-blue-50/50 text-blue-600 font-bold"
+                                            "flex-shrink-0 flex flex-col items-center justify-center border-r border-gray-50 dark:border-gray-800 text-[10px]",
+                                            isWeekend ? "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500" : "text-gray-600 dark:text-gray-400",
+                                            isToday && "bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
                                         )}
                                         style={{ width: CELL_WIDTH }}
                                     >
-                                        {/* <span className="uppercase tracking-tighter opacity-70 mb-0.5">{format(date, 'EEE')}</span> */}
                                         <span className="">{format(date, 'd')} ({format(date, 'EE', { locale: ja })})</span>
                                     </div>
                                 );
@@ -129,9 +128,24 @@ export function GanttChart({ tasks }: GanttChartProps) {
                         {/* Background Grid Lines */}
                         <div className="absolute inset-0 flex pointer-events-none z-0">
                             {dates.map((_, i) => (
-                                <div key={i} className="flex-shrink-0 border-r border-gray-50 h-full" style={{ width: CELL_WIDTH }} />
+                                <div key={i} className="flex-shrink-0 border-r border-gray-50 dark:border-gray-800 h-full" style={{ width: CELL_WIDTH }} />
                             ))}
                         </div>
+
+                        {/* Today Highlight Line */}
+                        {(() => {
+                            const today = new Date();
+                            const todayOffset = differenceInDays(today, startDate);
+                            if (todayOffset >= 0 && todayOffset < dates.length) {
+                                return (
+                                    <div
+                                        className="absolute top-0 bottom-0 w-px bg-red-500/50 dark:bg-red-400/50 z-10 pointer-events-none dashed border-l border-red-500 border-dashed"
+                                        style={{ left: todayOffset * CELL_WIDTH + CELL_WIDTH / 2 }}
+                                    />
+                                );
+                            }
+                            return null;
+                        })()}
 
                         {/* Task Rows */}
                         {sortedTasks.map((task) => {
@@ -150,7 +164,7 @@ export function GanttChart({ tasks }: GanttChartProps) {
                             return (
                                 <div
                                     key={task.id}
-                                    className="relative group border-b border-gray-50/50 hover:bg-gray-50/40 transition-colors z-10"
+                                    className="relative group border-b border-gray-50/50 dark:border-gray-800/50 hover:bg-gray-50/40 dark:hover:bg-gray-800/40 transition-colors z-10"
                                     style={{ height: ROW_HEIGHT }}
                                 >
                                     {/* Bar */}
