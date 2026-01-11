@@ -14,30 +14,30 @@ export default function ProjectsPage() {
     const router = useRouter();
 
     useEffect(() => {
-        fetchProjects();
-    }, []);
+        const fetchProjects = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push('/login');
+                    return;
+                }
 
-    const fetchProjects = async () => {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                router.push('/login');
-                return;
+                const { data, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                setProjects(data || []);
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+            } finally {
+                setLoading(false);
             }
+        };
 
-            const { data, error } = await supabase
-                .from('projects')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            setProjects(data || []);
-        } catch (error) {
-            console.error('Error fetching projects:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        fetchProjects();
+    }, [router]);
 
     const createProject = async (e: React.FormEvent) => {
         e.preventDefault();

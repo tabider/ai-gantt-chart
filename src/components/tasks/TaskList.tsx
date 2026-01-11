@@ -69,7 +69,7 @@ export function TaskList({ tasks, onEdit }: TaskListProps) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {sortedTasks.map(({ task, isLastChild }) => {
+                        {sortedTasks.map(({ task }) => {
                             const isChild = !!task.parent_id;
                             const hasChildren = tasks.some(t => t.parent_id === task.id);
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 import { Project, Task } from '@/types';
 import { TaskList } from '@/components/tasks/TaskList';
 import { GanttChart } from '@/components/gantt/GanttChart';
@@ -16,7 +17,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
     const [project, setProject] = useState<Project | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -24,6 +25,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
 
     const router = useRouter();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchData();
     }, [params.id]);
@@ -80,15 +82,10 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
 
     const handleCreateOrUpdateTask = async (taskData: Partial<Task>) => {
         if (!isOwner) return; // Guard
-        // ... (existing logic)
-        // It's better to just keep existing logic but wrapped in isOwner check for safety, 
-        // though UI hides buttons.
 
-        // RE-WRITING FULL FUNCTION FOR SAFETY IN REPLACEMENT
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // ... (Same logic as before)
         try {
             if (taskData.id) {
                 // Update
@@ -125,9 +122,12 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
             }
 
             fetchData();
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
-            alert(`エラーが発生しました: ${e.message}`);
+            let msg = 'Unknown error';
+            if (e instanceof Error) msg = e.message;
+            if (typeof e === 'string') msg = e;
+            alert(`エラーが発生しました: ${msg}`);
         }
     };
 
